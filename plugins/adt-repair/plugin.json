@@ -1,0 +1,26 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "adt-repair",
+  "version": "1.0.0",
+  "description": "Audit and repair an existing ADT using its source PDF and optional teacher or reviewer notes.",
+  "author": {"name": "elasticsounds", "url": "https://github.com/elasticsounds"},
+  "homepage": "https://github.com/elasticsounds/adt-repair",
+  "repository": "https://github.com/elasticsounds/adt-repair",
+  "license": "MIT",
+  "keywords": ["education", "accessibility", "textbooks", "pdf", "adt"],
+  "extensions": {
+    "com.openai": {
+      "requires_local_executor": true,
+      "interface": {
+        "displayName": "ADT Repair",
+        "shortDescription": "Repair digital textbooks against their source PDF",
+        "longDescription": "Inspect source pages and digital sections, repair layouts and assets, preserve the existing reader and activities, incorporate reviewer notes, and deliver a shareable review report.",
+        "developerName": "elasticsounds",
+        "category": "Productivity",
+        "capabilities": ["Read", "Write"],
+        "websiteURL": "https://github.com/elasticsounds/adt-repair",
+        "defaultPrompt": ["Audit and repair my ADT folder using its source PDF and any teacher or reviewer notes."]
+      }
+    }
+  }
+}

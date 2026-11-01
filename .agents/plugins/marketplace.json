@@ -1,0 +1,10 @@
+{
+  "name": "elasticsounds-adt",
+  "interface": {"displayName": "ADT Repair"},
+  "plugins": [{
+    "name": "adt-repair",
+    "source": {"source": "local", "path": "./plugins/adt-repair"},
+    "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
+    "category": "Productivity"
+  }]
+}

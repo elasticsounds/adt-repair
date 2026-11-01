@@ -1,0 +1,4 @@
+interface:
+  display_name: "PDF-guided ADT repair"
+  short_description: "Restyle existing ADTs while preserving their reader"
+  default_prompt: "Use $adt-pdf-restyle to audit and repair this ADT using its source PDF and optional teacher or reviewer notes, preserving its reader and activities."
