@@ -112,8 +112,12 @@ def prepare(adt, pdf, out, notes=(), pages='all', mode='repair', max_gb=4):
             shutil.copy2(source, job / relative)
             copied_notes.append({'source': str(source), 'copy': relative.as_posix(), 'sha256': sha256(source)})
         config = json.loads((source_root / 'assets/config.json').read_text(encoding='utf-8'))
+        plugin_manifest = Path(__file__).resolve().parents[3] / 'plugin.json'
+        tool_version = (json.loads(plugin_manifest.read_text(encoding='utf-8'))['version']
+                        if plugin_manifest.is_file() else 'unpackaged')
         manifest = {
-            'schema_version': 1, 'tool_version': '1.0.0',
+            'schema_version': 1,
+            'tool_version': tool_version,
             'created_at': datetime.now(timezone.utc).isoformat(), 'mode': mode,
             'input': {'adt': str(adt), 'pdf': str(pdf), 'pdf_sha256': sha256(pdf),
                       'adt_zip_sha256': sha256(adt) if adt.is_file() else None},

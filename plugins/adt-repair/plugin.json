@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "adt-repair",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Audit and repair an existing ADT using its source PDF and optional teacher or reviewer notes.",
   "author": {"name": "elasticsounds", "url": "https://github.com/elasticsounds"},
   "homepage": "https://github.com/elasticsounds/adt-repair",
@@ -13,13 +13,21 @@
       "requires_local_executor": true,
       "interface": {
         "displayName": "ADT Repair",
-        "shortDescription": "Repair digital textbooks against their source PDF",
-        "longDescription": "Inspect source pages and digital sections, repair layouts and assets, preserve the existing reader and activities, incorporate reviewer notes, and deliver a shareable review report.",
+        "shortDescription": "Repair digital textbooks",
+        "longDescription": "For textbook production teams: audit and repair an existing Accessible Digital Textbook (ADT) using its original PDF and optional teacher or reviewer notes. Inspect source pages and digital sections, derive book-specific styles and reusable components, repair layouts and assets, check activities, and produce a standalone review report. Preserve the existing reader, content bindings, navigation, languages and saved-response contracts. Requires local desktop execution, Python, Node.js, Poppler and a Chromium browser; dependencies are installed separately. This is an agent workflow with local helpers, not an automatic converter or an accessibility certification. Some books need book-specific adapters and human review. The plugin has no hosted service or telemetry endpoint; model processing follows the user's Codex account and settings.",
         "developerName": "elasticsounds",
         "category": "Productivity",
         "capabilities": ["Read", "Write"],
         "websiteURL": "https://github.com/elasticsounds/adt-repair",
-        "defaultPrompt": ["Audit and repair my ADT folder using its source PDF and any teacher or reviewer notes."]
+        "supportURL": "https://github.com/elasticsounds/adt-repair/issues",
+        "privacyPolicyURL": "https://github.com/elasticsounds/adt-repair/blob/main/docs/PRIVACY.md",
+        "composerIcon": "./assets/icon.svg",
+        "logo": "./assets/icon.svg",
+        "defaultPrompt": [
+          "Audit and repair my ADT folder using its source PDF and any teacher or reviewer notes.",
+          "Compare these ADT sections with the PDF and produce an issue report before making changes.",
+          "Update this book's shared components while preserving its reader, languages and working activities."
+        ]
       }
     }
   }

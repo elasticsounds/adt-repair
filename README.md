@@ -1,6 +1,6 @@
 # ADT Repair
 
-**Version 1.0.0 — a Codex plugin for auditing and repairing an existing Accessible Digital Textbook using its source PDF.**
+**Version 1.0.1 — a Codex plugin for auditing and repairing an existing Accessible Digital Textbook using its source PDF.**
 
 Give Codex an ADT folder or ZIP, the original PDF, and optionally notes from teachers or reviewers. ADT Repair guides source comparison, layout and asset repairs, activity checks, accessibility review, and a standalone PDF report alongside the repaired book.
 
@@ -11,7 +11,7 @@ This is an agent skill with local helper scripts. Codex performs the analysis an
 Use a recent Codex desktop/CLI version with plugin marketplace support:
 
 ```sh
-codex plugin marketplace add elasticsounds/adt-repair --ref v1.0.0
+codex plugin marketplace add elasticsounds/adt-repair --ref v1.0.1
 codex plugin add adt-repair@elasticsounds-adt
 ```
 
@@ -79,6 +79,8 @@ Static checks and browser scans catch specific errors. They do not establish scr
 ## Privacy and usage cost
 
 This plugin runs local scripts and has no hosted service, telemetry endpoint, MCP server or bundled API key. However, Codex may send supplied text, images and tool results to the model under your account's configuration. Local processing does not mean the model operates offline. Review your team's data policy before supplying books or notes.
+
+Read the [privacy policy](docs/PRIVACY.md). Support is available through [GitHub Issues](https://github.com/elasticsounds/adt-repair/issues); do not include private source material in a public issue.
 
 Model usage is charged to the user's Codex allowance or API account. No fixed price is guaranteed. Shared templates, targeted reruns and compact evidence can reduce usage; record actual tokens and cost when available.
 

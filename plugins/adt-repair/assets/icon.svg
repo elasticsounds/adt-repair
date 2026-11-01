@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">ADT Repair — open book with a check mark</title>
+  <rect width="512" height="512" rx="112" fill="#263550"/>
+  <path d="M86 132c60-19 116-13 170 18v226c-52-30-109-36-170-17V132Z" fill="#ffffff"/>
+  <path d="M426 132c-60-19-116-13-170 18v226c52-30 109-36 170-17V132Z" fill="#e1e8f6"/>
+  <path d="M256 153v216" fill="none" stroke="#263550" stroke-width="9" stroke-linecap="round"/>
+  <path d="M120 184c32-5 65-1 97 12m-97 38c32-5 65-1 97 12m-97 38c32-5 65-1 97 12" fill="none" stroke="#536782" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="359" cy="333" r="76" fill="#117b65" stroke="#263550" stroke-width="12"/>
+  <path d="m323 333 24 24 48-51" fill="none" stroke="#ffffff" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

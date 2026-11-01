@@ -11,8 +11,9 @@ PLUGIN = ROOT / 'plugins/adt-repair'
 ROOT_FILES = ['README.md', 'CHANGELOG.md', 'CONTRIBUTING.md', '.gitignore',
               '.agents/plugins/marketplace.json', '.github/workflows/checks.yml',
               'scripts/build_release.py', 'scripts/validate_package.py',
-              'docs/public-directory.md', 'tests/test_helpers.py', 'tests/browser-smoke.mjs']
+              'docs/public-directory.md', 'docs/PRIVACY.md', 'tests/test_helpers.py', 'tests/browser-smoke.mjs']
 PLUGIN_FILES = ['plugin.json', 'package.json', 'package-lock.json', 'requirements.txt',
+                'assets/icon.svg',
                 'skills/adt-pdf-restyle/SKILL.md', 'skills/adt-pdf-restyle/agents/openai.yaml',
                 'skills/adt-pdf-restyle/references/setup.md',
                 'skills/adt-pdf-restyle/references/reporting.md',

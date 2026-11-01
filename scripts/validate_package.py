@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 import re
+import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -16,6 +17,21 @@ def validate():
     assert re.fullmatch(r'\d+\.\d+\.\d+', manifest['version'])
     assert manifest['version'] == package['version']
     assert manifest['extensions']['com.openai']['requires_local_executor'] is True
+    interface = manifest['extensions']['com.openai']['interface']
+    for field, limit in [('displayName', 30), ('shortDescription', 30), ('longDescription', 4000), ('developerName', 80)]:
+        assert 0 < len(interface[field]) <= limit, f'Listing field length: {field}'
+    assert len(interface.get('defaultPrompt', [])) <= 3
+    assert all(len(prompt) <= 128 for prompt in interface.get('defaultPrompt', []))
+    assert 'screenshots' not in interface, 'Skills-only uploads exclude screenshots'
+    for field in ['logo', 'composerIcon']:
+        relative = interface[field]
+        assert relative.startswith('./')
+        asset = (PLUGIN / relative).resolve()
+        assert asset.is_relative_to(PLUGIN) and asset.is_file()
+        assert asset.stat().st_size <= 5 * 1024 * 1024
+        svg = ET.parse(asset).getroot()
+        dimensions = [float(v) for v in svg.attrib['viewBox'].split()]
+        assert dimensions[2] == dimensions[3] and dimensions[2] >= 48
     assert not (PLUGIN / 'mcp.json').exists(), 'v1 has no MCP dependency'
     for entry in marketplace['plugins']:
         source = (ROOT / entry['source']['path']).resolve()

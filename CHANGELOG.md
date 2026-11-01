@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1 — 2026-11-01
+
+Directory submission preparation: shorter listing subtitle, square book/check icon, expanded description and starter prompts, privacy policy and support links. Package validation now checks listing limits and branding assets. Prepared jobs record the manifest's actual tool version.
+
+Public directory submission and approval are separate from the GitHub release; the current submission status is recorded in docs/public-directory.md.
+
 ## 1.0.0 — 2026-11-01
 
 First shareable release of the PDF-guided ADT repair workflow.
