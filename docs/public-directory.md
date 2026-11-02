@@ -1,6 +1,8 @@
 # Public plugin directory: next publication step
 
-Status: submission package preparation in progress. A GitHub release is not publication in the public OpenAI Plugin Directory. No public-directory approval is claimed.
+Status on November 1, 2026: v1.0.1 uploaded as a draft under UNICEF's verified business identity. It is not submitted for review or published. The portal reports two blocking findings: "Terms of service URL is required" and "We are not accepting more skills-only submissions at this time." OpenAI must resolve submission access before this skills-only package can proceed. A GitHub release is separate from public directory publication.
+
+The GitHub v1.2.1 release adds Studio reimport preparation and fidelity safeguards. It does not replace the v1.0.1 directory draft or resolve the recorded admission restriction. Experimental economy routing remains unapproved for production.
 
 ADT Repair is a skills-only plugin that calls local programs. Its portable manifest declares `extensions.com.openai.requires_local_executor: true`. It has no MCP server or lifecycle hooks. It therefore follows the skills-only desktop-execution submission path; do not add a local MCP server just to package this workflow.
 
@@ -32,4 +34,4 @@ These requirements can change; re-check them at submission time.
 - Included 512×512 SVG icon referenced as logo and composer icon.
 - Published-source privacy policy and GitHub support URL.
 - Original textbook and reviewer data excluded.
-- Account sign-in, submitting organization/project and verified publisher identity must be established in the portal before submission can be confirmed.
+- Account sign-in and the verified UNICEF business identity were established for the draft upload. Review submission remains blocked as described above.

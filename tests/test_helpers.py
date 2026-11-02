@@ -96,6 +96,26 @@ class Helpers(unittest.TestCase):
         self.assertEqual(result['notes'], [])
         self.assertIsNotNone(result['input']['adt_zip_sha256'])
 
+    def test_execution_mode_is_explicit_and_independent_of_operation(self):
+        result = prepare.prepare(self.book, self.pdf, self.root / 'economy-job',
+                                 mode='audit', execution_mode='economy')
+        self.assertEqual(result['execution_mode'], 'economy')
+        self.assertEqual(result['operation'], 'audit')
+        self.assertEqual(result['mode'], 'audit')
+        self.assertEqual(prepare.prepare(self.book, self.pdf, self.root / 'legacy-api')['execution_mode'], 'standard')
+        for value in ['auto', 'budget', 'audit']:
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                prepare.prepare(self.book, self.pdf, self.root / 'invalid', execution_mode=value)
+        import sys
+        command = [sys.executable, str(SCRIPTS / 'prepare_job.py'), '--adt', str(self.book),
+                   '--pdf', str(self.pdf), '--out', str(self.root / 'cli-job')]
+        missing = subprocess.run(command, capture_output=True, text=True)
+        self.assertNotEqual(missing.returncode, 0)
+        self.assertIn('--execution-mode', missing.stderr)
+        accepted = subprocess.run(command + ['--execution-mode', 'economy'], capture_output=True, text=True)
+        self.assertEqual(accepted.returncode, 0, accepted.stderr)
+        self.assertEqual(json.loads(accepted.stdout)['execution_mode'], 'economy')
+
     def test_prepare_rejects_overwrite_and_nested_output(self):
         with self.assertRaises(ValueError):
             prepare.prepare(self.book, self.pdf, self.book / 'job')
@@ -206,6 +226,34 @@ class Helpers(unittest.TestCase):
         output = report.build(job, self.root / 'report.pdf')
         text = '\n'.join(page.extract_text() for page in PdfReader(output).pages)
         self.assertIn('Validation is not established', text)
+
+    def test_report_records_model_attempts_and_unknown_usage(self):
+        from pypdf import PdfReader
+        job = self.root / 'job'
+        prepare.prepare(self.book, self.pdf, job, execution_mode='economy')
+        dump(job / 'reports/execution.json', {'tasks': {'classify-001': {
+            'requested': {'model': 'gpt-6.1-terra'}, 'actual_model': 'gpt-6.1-terra',
+            'state': 'finished', 'status': 'passed', 'provider_usage': None,
+            'attempts': [{'requested': {'model': 'gpt-6-luna'}, 'actual_model': 'gpt-6-luna',
+                          'status': 'needs-escalation', 'provider_usage': None}]}}})
+        output = report.build(job, self.root / 'routing-report.pdf')
+        text = '\n'.join(page.extract_text() for page in PdfReader(output).pages)
+        for expected in ['economy', 'gpt-6-luna', 'gpt-6.1-terra', 'needs-escalation',
+                         'Cost is unmeasured', 'unknown, not zero']:
+            self.assertIn(expected, text)
+
+    def test_report_does_not_conflate_preview_acceptance_with_roundtrip(self):
+        from pypdf import PdfReader
+        job = self.root / 'job'
+        prepare.prepare(self.book, self.pdf, job)
+        dump(job / 'studio-reimport/studio-handoff.json', {
+            'stages': {'preflight': 'passed', 'preview': 'passed', 'roundtrip': 'failed', 'tts': 'not-run'},
+            'runtime_followups': [{'id': 'MAP-GRADING', 'status': 'open', 'description': 'Wrong answers accepted after export'}],
+        })
+        output = report.build(job, self.root / 'handoff-report.pdf')
+        text = '\n'.join(page.extract_text() for page in PdfReader(output).pages)
+        for expected in ['preview: passed', 'roundtrip: failed', 'tts: not-run', 'MAP-GRADING']:
+            self.assertIn(expected, text)
 
 
 if __name__ == '__main__':

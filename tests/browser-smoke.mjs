@@ -13,9 +13,13 @@ try {
   await fs.mkdir(path.join(book, 'assets'), {recursive: true});
   await fs.writeFile(path.join(book, 'assets/config.json'), JSON.stringify({languages: {available: ['en', 'sq'], default: 'en'}}));
   await fs.writeFile(path.join(book, 'content/pages.json'), JSON.stringify([{section_id: 'lesson', href: 'lesson.html'}]));
+  for (const language of ['en', 'sq']) {
+    await fs.mkdir(path.join(book, 'content/i18n', language), {recursive: true});
+    await fs.writeFile(path.join(book, 'content/i18n', language, 'texts.json'), JSON.stringify({greeting: language === 'sq' ? 'Përshëndetje' : 'Hello'}));
+  }
   await fs.writeFile(path.join(book, 'lesson.html'), `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Fixture</title></head><body>
-    <main id="content"><h1>Test lesson</h1><p id="greeting">Hello</p></main>
-    <script>document.getElementById('greeting').textContent=localStorage.getItem('currentLanguage')==='sq'?'Përshëndetje':'Hello';</script>
+    <main id="content"><h1>Test lesson</h1><p id="greeting" data-id="greeting">Hello</p></main>
+    <script>var language=JSON.parse(localStorage.getItem('currentLanguage'));document.documentElement.lang=language;document.getElementById('greeting').textContent=language==='sq'?'Përshëndetje':'Hello';</script>
     </body></html>`);
   for (const file of [false, true]) {
     const destination = out + (file ? '-file' : '-http');
@@ -26,10 +30,13 @@ try {
     });
     assert.equal(code, 0);
     const rows = JSON.parse(await fs.readFile(path.join(destination, 'browser-results.json'), 'utf8'));
+    const journal = (await fs.readFile(path.join(destination, 'browser-results.jsonl'), 'utf8'))
+      .trim().split('\n').map(line => JSON.parse(line));
+    assert.deepEqual(journal, rows);
     assert.equal(rows.length, 4);
     assert.ok(rows.filter(r => r.requestedLanguage === 'sq').every(r => r.text.includes('Përshëndetje')));
     assert.ok(rows.every(r => r.screenshot && !r.failure));
-    assert.ok(rows.every(r => r.languageSelectionVerified === false));
+    assert.ok(rows.every(r => r.languageSelectionVerified === true));
   }
   console.log('HTTP/offline captures and both requested language preferences passed on the synthetic fixture.');
 } finally { await fs.rm(temporary, {recursive: true, force: true}); }

@@ -16,6 +16,8 @@ def validate():
     assert manifest['name'] == 'adt-repair'
     assert re.fullmatch(r'\d+\.\d+\.\d+', manifest['version'])
     assert manifest['version'] == package['version']
+    lock = json.loads((PLUGIN / 'package-lock.json').read_text())
+    assert manifest['version'] == lock['version'] == lock['packages']['']['version']
     assert manifest['extensions']['com.openai']['requires_local_executor'] is True
     interface = manifest['extensions']['com.openai']['interface']
     for field, limit in [('displayName', 30), ('shortDescription', 30), ('longDescription', 4000), ('developerName', 80)]:

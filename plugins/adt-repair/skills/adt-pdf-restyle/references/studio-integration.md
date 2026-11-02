@@ -2,6 +2,8 @@
 
 Treat these as patterns to verify in the actual bundle, not a guarantee about every Studio release.
 
+For the final import-compatible deliverable, follow [Studio reimport preparation](studio-reimport.md). The standalone repair may use a scoped CSS layer; PR #803's import copy must carry supported section-level presentation instead. Do not weaken the accepted reader or confuse its contract with the stricter import representation.
+
 ## Identity and content
 
 `content/pages.json` is the navigation spine. `meta[name=title-id]` identifies a section; `page-section-id` often stores its one-based position in the spine, **not** the printed page number. Do not renumber sections for a visual refresh.

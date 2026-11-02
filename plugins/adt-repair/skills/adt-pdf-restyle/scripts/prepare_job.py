@@ -74,8 +74,13 @@ def write_json(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 
 
-def prepare(adt, pdf, out, notes=(), pages='all', mode='repair', max_gb=4):
+def prepare(adt, pdf, out, notes=(), pages='all', mode='repair', max_gb=4,
+            execution_mode='standard'):
     from pypdf import PdfReader
+    if execution_mode not in {'standard', 'economy'}:
+        raise ValueError('Execution mode must be standard or economy.')
+    if mode not in {'audit', 'repair'}:
+        raise ValueError('Operation must be audit or repair.')
     adt, pdf, out = adt.resolve(), pdf.resolve(), out.resolve()
     if out.exists():
         raise ValueError('Output already exists; choose a new job folder to avoid overwriting work.')
@@ -102,8 +107,12 @@ def prepare(adt, pdf, out, notes=(), pages='all', mode='repair', max_gb=4):
             raise ValueError('ADT input must be a folder or ZIP.')
         job = staging / 'job'
         job.mkdir()
-        shutil.copytree(source_root, job / 'baseline')
-        shutil.copytree(source_root, job / 'repaired-adt')
+        if adt.is_dir():
+            shutil.copytree(source_root, job / 'baseline')
+        else:
+            # The temporary extraction is disposable; move it instead of a third full copy.
+            shutil.move(str(source_root), job / 'baseline')
+        shutil.copytree(job / 'baseline', job / 'repaired-adt')
         (job / 'reports').mkdir()
         (job / 'notes').mkdir()
         copied_notes = []
@@ -111,20 +120,22 @@ def prepare(adt, pdf, out, notes=(), pages='all', mode='repair', max_gb=4):
             relative = Path('notes') / f'{index:03d}-{source.name}'
             shutil.copy2(source, job / relative)
             copied_notes.append({'source': str(source), 'copy': relative.as_posix(), 'sha256': sha256(source)})
-        config = json.loads((source_root / 'assets/config.json').read_text(encoding='utf-8'))
+        config = json.loads((job / 'baseline/assets/config.json').read_text(encoding='utf-8'))
         plugin_manifest = Path(__file__).resolve().parents[3] / 'plugin.json'
         tool_version = (json.loads(plugin_manifest.read_text(encoding='utf-8'))['version']
                         if plugin_manifest.is_file() else 'unpackaged')
         manifest = {
             'schema_version': 1,
             'tool_version': tool_version,
-            'created_at': datetime.now(timezone.utc).isoformat(), 'mode': mode,
+            'created_at': datetime.now(timezone.utc).isoformat(),
+            'execution_mode': execution_mode, 'operation': mode, 'mode': mode,
             'input': {'adt': str(adt), 'pdf': str(pdf), 'pdf_sha256': sha256(pdf),
                       'adt_zip_sha256': sha256(adt) if adt.is_file() else None},
             'physical_pdf_pages': selected,
             'languages': config.get('languages', {}).get('available', []),
             'notes': copied_notes, 'baseline': 'baseline', 'working_copy': 'repaired-adt',
             'stage': 'prepared',
+            'final_stage': {'name': 'studio-reimport', 'status': 'pending' if mode == 'repair' else 'not-applicable'},
         }
         write_json(job / 'job.json', manifest)
         write_json(job / 'reports/issues.json', {'schema_version': 1, 'issues': []})
@@ -142,15 +153,20 @@ def main():
     parser.add_argument('--out', required=True, type=Path)
     parser.add_argument('--notes', action='append', default=[], type=Path)
     parser.add_argument('--pages', default='all')
-    parser.add_argument('--mode', choices=['audit', 'repair'], default='repair')
+    parser.add_argument('--execution-mode', choices=['standard', 'economy'], required=True,
+                        help='Startup cost policy; economy must be explicitly selected.')
+    parser.add_argument('--operation', '--mode', dest='operation', choices=['audit', 'repair'],
+                        default='repair', help='Audit or repair; --mode is a legacy alias.')
     parser.add_argument('--max-extracted-gb', type=float, default=4)
     args = parser.parse_args()
     try:
-        result = prepare(args.adt, args.pdf, args.out, args.notes, args.pages, args.mode, args.max_extracted_gb)
+        result = prepare(args.adt, args.pdf, args.out, args.notes, args.pages,
+                         args.operation, args.max_extracted_gb, args.execution_mode)
     except (ValueError, OSError, zipfile.BadZipFile) as error:
         parser.exit(1, f'{error}\n')
     print(json.dumps({'job': str(args.out.resolve()), 'pages': len(result['physical_pdf_pages']),
-                      'languages': result['languages'], 'note_files': len(result['notes'])}))
+                      'languages': result['languages'], 'note_files': len(result['notes']),
+                      'execution_mode': result['execution_mode'], 'operation': result['operation']}))
 
 
 if __name__ == '__main__':

@@ -11,7 +11,11 @@ import re
 VOID = {'area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr'}
 
 def digest(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    result = hashlib.sha256()
+    with path.open('rb') as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+            result.update(chunk)
+    return result.hexdigest()
 
 class Page(HTMLParser):
     def __init__(self):
@@ -56,15 +60,18 @@ class Page(HTMLParser):
 
 def snapshot(root,pdf=None):
     root=root.resolve();spine=json.loads((root/'content/pages.json').read_text())
-    pages=[]
+    pages=[];page_hashes={}
     for entry in spine:
         f=(root/entry['href']).resolve()
         if not f.is_relative_to(root):raise ValueError('Page escapes ADT root: '+entry['href'])
-        scanner=Page();scanner.feed(f.read_text())
+        content=f.read_bytes()
+        scanner=Page();scanner.feed(content.decode('utf-8'))
+        page_hashes[f]=hashlib.sha256(content).hexdigest()
         m=re.match(r'pg(\d+)_',f.name)
         pages.append({'href':entry['href'],'source_page_hint':int(m[1]) if m else None,
-                      'sha256':digest(f),**scanner.result()})
-    file_hashes={str(f.relative_to(root)):digest(f) for f in sorted(root.rglob('*')) if f.is_file() and not f.is_symlink()}
+                      'sha256':page_hashes[f],**scanner.result()})
+    file_hashes={str(f.relative_to(root)):page_hashes[f] if f in page_hashes else digest(f)
+                 for f in sorted(root.rglob('*')) if f.is_file() and not f.is_symlink()}
     missing=[];remote=[]
     for row in pages:
         for image in row['images']:

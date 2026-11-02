@@ -34,7 +34,9 @@ Create `reports/source-map.json` connecting each physical PDF page to zero, one 
 
 ## Shareable report
 
-Create one standalone PDF beside the repaired ADT. Include title, book/version/hash, date, scope, issue list and fixes, each reviewer note's disposition, accessibility and behavioral evidence, source coverage, incomplete/unperformed checks, narration follow-ups and recommendations. Distinguish proposals from completed work.
+Create one standalone PDF beside the repaired ADT. Include title, book/version/hash, date, scope, execution mode, issue list and fixes, each reviewer note's disposition, accessibility and behavioral evidence, source coverage, incomplete/unperformed checks, narration follow-ups and recommendations. Distinguish proposals from completed work.
+
+For repair jobs include the [final Studio reimport stage](studio-reimport.md): accepted repair and import ZIP hashes, actual Studio build, preflight, preview and round-trip states separately, ID/image/catalog migration records, removed controls/runtime follow-ups, visual differences and per-language narration plan. A successful preview does not establish preserved design, behavior or fresh audio. If the stage lives in `studio-reimport/`, keep its `studio-handoff.json` and evidence there and summarize them in the main report. TTS stays not-run until explicitly requested and verified.
 
 The bundled `build_report.py --job JOB --out REPORT.pdf` renders the issue, note and validation registers. It does not infer whether an issue was repaired or inspect screenshots. Fill the registers from actual evidence first. If you use another report renderer, preserve the same coverage. Inspect the resulting PDF visually and check non-ASCII book/language text; pass `--font` and `--font-bold` if the default font lacks required glyphs.
 
@@ -43,3 +45,5 @@ The bundled `build_report.py --job JOB --out REPORT.pdf` renders the issue, note
 Deliver the repaired folder/ZIP, editable component library, report and supporting evidence. Package the exact validated files and record their hashes. Do not include original books or reviewer notes in a public tool release.
 
 Persist stages in `job.json` or a work log. Resume from verified checkpoints rather than rerunning the entire book. Share extraction, styles and assets across languages; verify language-specific differences separately. Use scripts for mechanical checks. Record model, speed, actual input/cache-write/cached-input/output counts and measured cost when available; otherwise explicitly mark cost unmeasured. Never promise a fixed price or choose another model against the user's instruction.
+
+For new jobs, `job.json.execution_mode` is `standard` or `economy`; `operation` is `audit` or `repair` (legacy `mode` retains that operation). `reports/execution.json` records requested and session-reported actual models, attempts, outputs, mismatches and optional provider usage. See [execution policy](execution-modes.md). The helper does not invoke models, authenticate receipts or calculate billing. Missing receipts mean unknown cost. Put actual reused evidence keys and scope in `report-summary.md`; `workflow-cache.json` describes available evidence and does not prove reuse occurred. Include started, failed and escalated work when reporting usage; do not count only successful worker tasks or omit coordinator cost.
